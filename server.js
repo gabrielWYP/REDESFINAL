@@ -4,121 +4,145 @@ const path = require('path');
 const fs = require('fs');
 const { exec } = require('child_process');
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('app.db'); // Cambia a tu base de datos
+const db = new sqlite3.Database('db/app.db'); // Cambia a tu base de datos
 
 const app = express();
 
 // Configurar multer para guardar archivos en la carpeta 'uploads'
 const upload = multer({ dest: 'uploads/' });
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use('/modificados', express.static(path.join(__dirname, 'modificados')));
+
 app.use(express.json());
 
+
+function sleep(ms) {
+    const start = Date.now();
+    while (Date.now() - start < ms) {
+        // Espera activa
+    }
+}
+
+const guardarArchivo = (archivoPath, nuevoPath, res) => {
+    fs.rename(archivoPath, nuevoPath, (err) => {
+        if (err) {
+            console.error('Error al mover el archivo:', err.message);
+            return res.status(500).send('Error al guardar el archivo.');
+        }
+    });
+}
+
+const ejecutarComandoGuardar = (ejecutable, archivo, destino, timeStamp, res) => {
+    const comandoGuardar = `${ejecutable} "${archivo}" "${destino}" "${timeStamp}"`;
+    exec(comandoGuardar, (err, stdout, stderr) => {
+
+        if (err) {
+            console.error('Error ejecutando el programa C++:', err.message);
+            return res.status(500).send('Error al procesar el archivo.');
+        }
+
+        if (stderr) {
+            console.error('Error en el programa C++:', stderr);
+            return res.status(500).send('Error en el programa.');
+        }
+    });
+
+}
+
+const ejecutarComandoHash = (pathDecode, filePath, res) => {
+    return new Promise((resolve, reject) => {
+        const comandoHashear = `${pathDecode} "${filePath}"`;
+        exec(comandoHashear, (err, stdout, stderr) => {
+            if (err) {
+                console.error('Error ejecutando el programa C++:', err.message);
+                reject('Error al procesar el archivo.');
+            } else if (stderr) {
+                console.error('Error en el programa C++:', stderr);
+                reject('Error en el programa.');
+            } else {
+                resolve(stdout.trim()); // Resuelve con el hash
+            }
+        });
+    });
+    
+}
 
 // Ruta para subir archivos
 app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
     if (!req.file) {
         return res.status(400).send('No se recibió ningún archivo.');
     }
+    //Para guardar el archivo
     const originalFileName = req.file.originalname;
-
     const filePath = req.file.path;
     const newFilePath = path.join('uploads', originalFileName);
-    console.log(newFilePath)
 
-    fs.rename(filePath, newFilePath, (err) => {
-        if (err) {
-            console.error('Error al mover el archivo:', err.message);
-            return res.status(500).send('Error al guardar el archivo.');
-        }
+    const originalUrl = `http://localhost:3000/uploads/${originalFileName}`;
+    const modifiedUrl = `http://localhost:3000/modificados/${originalFileName}`;
 
-        // Devolver la ruta de descarga del archivo guardado
-        res.send({
-            mensaje: 'Archivo subido y guardado exitosamente.',
-            rutaArchivo: `/descargar-archivo/${path.basename(newFilePath)}`
-        });
-    });
+    guardarArchivo(filePath, newFilePath, res);
 
     //Para subir el archivo y guardar ambos
 
     const pathReal = `uploads/${originalFileName}`
     const timestamp = new Date().toISOString();
     const pathCarpeta = "modificados/";
-    
     const pathToExecutable = path.resolve(__dirname, 'coder.exe');
-    console.log(pathToExecutable)
 
-    const command_guardar = `${pathToExecutable} "${pathReal}" "${pathCarpeta}" "${timestamp}"`;
+    ejecutarComandoGuardar(pathToExecutable,pathReal,pathCarpeta,timestamp,res);
 
-    console.log('Ejecutando comando:', command_guardar);
+    //Await para ejecutar el comando
+    sleep(300);
 
-    
-    exec(command_guardar, (err, stdout, stderr) => {
-
-        if (err) {
-            console.error('Error ejecutando el programa C++:', err.message);
-            return res.status(500).send('Error al procesar el archivo.');
-        }
-
-        if (stderr) {
-            console.error('Error en el programa C++:', stderr);
-            return res.status(500).send('Error en el programa.');
-        }
-    });
-
-    
     //Para obtener el timeStamp hasheado
 
-    const pathDecoder = path.resolve(__dirname, 'decoder.exe')
+    let hashValor = "";
 
-    const modFile = `modificados/${originalFileName}`
-
-    const command_hash = `${pathDecoder} "${modFile}"`
-
-    console.log("Ejecutando comando: ", command_hash);
-
-    let hash_timeStamp = ""
+    const actualizarHashValor = async () => {
+        try {
+            const pathDecoder = path.resolve(__dirname, 'decoder.exe');
+            const modFile = `modificados/${originalFileName}`;
     
-    exec(command_hash, (err, stdout, stderr) => {
-
-        if (err) {
-            console.error('Error ejecutando el programa C++:', err.message);
-            return res.status(500).send('Error al procesar el archivo.');
+            // Espera al resultado de la promesa y asigna el valor a la variable global
+            hashValor = await ejecutarComandoHash(pathDecoder, modFile, res);
+        } catch (error) {
+            console.error(error);
         }
+    };
 
-        if (stderr) {
-            console.error('Error en el programa C++:', stderr);
-            return res.status(500).send('Error en el programa.');
-        }
+    actualizarHashValor().then(() => {
+        // Aquí `hashValor` estará actualizado después de que se resuelva la promesa
+        console.log('Variable externa hashValor:', hashValor);
 
-        hash_timeStamp = stdout.trim();
-        console.log(hash_timeStamp);
+        const info = "ga";
 
-        
-        
-        
-        
-        
-    });
-
-        /*
-        console.log('hash encontrado', hash);
-
-        const query = `INSERT INTO valores_hasheados (archivo_hasheado, timestamp_hash) VALUES (?, ?)`;
-        db.run(query, [hash, new Date().toISOString()], function (err) {
+        const query = `
+            INSERT INTO valores_hasheados (informacion, URL_vanilla, URL_modified, hash_value_modified)
+            VALUES (?, ?, ?, ?)
+        `;
+        db.run(query, [info, originalUrl, modifiedUrl, hashValor], function (err) {
             if (err) {
                 console.error('Error al guardar en SQLite:', err.message);
                 return res.status(500).send('Error al guardar en la base de datos.');
             }
-        */
-    
 
-    //http://localhost:3000/uploads/nombreArchivo
-    //http://localhost:3000/modificados/nombreArchivo
+            res.send({
+                id: this.lastID,
+                informacion: info,
+                URL_vanilla: originalUrl,
+                URL_modified: modifiedUrl,
+                hash_value_modified: hashValor,
+            });
+        });
+
+
+        
+    });
+
 }); 
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-app.use('/modificados', express.static(path.join(__dirname, 'modificados')));
 
 
 //Ruta para servir archivos
@@ -195,7 +219,31 @@ app.get('/buscar-info', (req, res) => {
 
 
 
+app.post('/buscar-info2', upload.single('archivo'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).send('No se recibió ningún archivo.');
+    }
 
+    const originalFileName = req.file.originalname;
+
+    // Ruta para guardar el archivo en la carpeta tmp
+    const tmpFolderPath = path.join('tmp', originalFileName);
+    console.log('Ruta donde se guardará el archivo:', tmpFolderPath);
+
+    // Mover el archivo a la carpeta tmp
+    fs.rename(req.file.path, tmpFolderPath, (err) => {
+        if (err) {
+            console.error('Error al mover el archivo:', err.message);
+            return res.status(500).send('Error al guardar el archivo.');
+        }
+
+        // Devolver la ruta del archivo guardado en tmp
+        res.send({
+            mensaje: 'Archivo subido y guardado exitosamente.',
+            rutaArchivo: `/tmp/${originalFileName}`
+        });
+    });
+});
 
 
 //Pagina principal  
