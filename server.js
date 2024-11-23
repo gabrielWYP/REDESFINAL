@@ -82,14 +82,17 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
 //Ruta para servir archivos
 // Ruta para servir archivos
 app.get('/descargar-archivo', (req, res) => {
-    const filePath = path.join(__dirname, 'modificado', 'nombre_del_archivo.ext'); // Reemplaza con el nombre de tu archivo
-    res.download(filePath, 'archivo_descargado.ext', (err) => {
+    const fileName = 'nombre_del_archivo.xlsx'; // Cambia esto al nombre exacto de tu archivo con su extensión
+    const filePath = path.join(__dirname, 'modificado', fileName); // Ruta completa al archivo en la carpeta 'modificado'
+
+    res.download(filePath, fileName, (err) => {
         if (err) {
             console.error('Error al descargar el archivo:', err);
             res.status(500).send('Error al descargar el archivo');
         }
     });
 });
+
 
 //Ruta para buscar archivos
 app.get('/buscar-info', (req,res) => {
