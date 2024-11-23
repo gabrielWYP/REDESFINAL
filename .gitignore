@@ -1,4 +1,6 @@
 /node_modules/
+/uploads/
 
 HASHING/logica/*.o
 node_modules
+uploads

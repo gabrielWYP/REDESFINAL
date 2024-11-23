@@ -1,71 +1,78 @@
 const express = require('express');
 const multer = require('multer');
-const sqlite3 = require('sqlite3').verbose();
-const { exec } = require('child_process');
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
+
+// Configurar multer para guardar archivos en la carpeta 'uploads'
 const upload = multer({ dest: 'uploads/' });
+
 app.use(express.json());
 
-//Conexion a la DB
-
-const db = new sqlite3.Database('db/app.db', (err) => {
-    if (err) {
-        console.error('Error al conectar a SQLite:', err.message);
-    } else {
-        console.log('Conectado a la base de datos SQLite (app.db).');
-    }
-});
-
-//Ruta para subir archivos
+// Ruta para subir archivos
 app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
     if (!req.file) {
         return res.status(400).send('No se recibió ningún archivo.');
     }
 
-    
-    const filePath = req.file.path;
+    const filePath = req.file.path;  // Ruta del archivo temporal
+    const originalFileName = req.file.originalname;  // Nombre original del archivo
+    const newFilePath = path.join('uploads', originalFileName);  // Ruta donde se guardará el archivo
 
-    const pathToExecutable = path.resolve(__dirname, 'hashing/logica/main.exe'); //Modificar 
-    const command = `"${pathToExecutable}" "${filePath}"`; 
-
-    exec(command, (err, stdout, stderr) => {
-
+    // Mover el archivo del directorio temporal a su destino final
+    fs.rename(filePath, newFilePath, (err) => {
         if (err) {
-            console.error('Error ejecutando el programa C++:', err.message);
-            return res.status(500).send('Error al procesar el archivo.');
+            console.error('Error al mover el archivo:', err.message);
+            return res.status(500).send('Error al guardar el archivo.');
         }
 
-        if (stderr) {
-            console.error('Error en el programa C++:', stderr);
-            return res.status(500).send('Error en el programa.');
-        }
-
-        const hash = stdout.trim(); 
-        console.log('hash encontrado', hash);
-
-        const query = `INSERT INTO valores_hasheados (archivo_hasheado, timestamp_hash) VALUES (?, ?)`; //Modificar
-        db.run(query, [hash, new Date().toISOString()], function (err) {
-            if (err) {
-                console.error('Error al guardar en SQLite:', err.message);
-                return res.status(500).send('Error al guardar en la base de datos.');
-            }
-
-            res.send({
-                mensaje: 'Archivo registrado exitosamente.',
-                hash: hash,
-                id: this.lastID,
-                timestamp: new Date().toISOString(),
-            });
-        });
-
-        fs.unlink(filePath, (err) => {
-            if (err) console.error('Error al eliminar archivo temporal:', err.message);
+        // Devolver la ruta de descarga del archivo guardado
+        res.send({
+            mensaje: 'Archivo subido y guardado exitosamente.',
+            rutaArchivo: `/descargar-archivo/${path.basename(newFilePath)}`
         });
     });
 });
+//Ruta para subir archivos
+
+
+    /*const newFilePath = path.join('modificados', `modificado_${originalFileName}`);
+
+    // Leer el archivo y agregar la fecha
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            console.error('Error al leer el archivo:', err.message);
+            return res.status(500).send('Error al procesar el archivo.');
+        }
+
+        // Obtener la fecha y hora actual
+        const now = new Date();
+        const fecha = now.toISOString();
+
+        // Agregar la fecha al contenido del archivo
+        const contenidoModificado = `${data}\n\nFecha: ${fecha}`;
+
+        // Guardar el archivo modificado
+        fs.writeFile(newFilePath, contenidoModificado, 'utf8', (err) => {
+            if (err) {
+                console.error('Error al guardar el archivo modificado:', err.message);
+                return res.status(500).send('Error al guardar el archivo modificado.');
+            }
+
+            // Eliminar el archivo temporal original
+            fs.unlink(filePath, (err) => {
+                if (err) console.error('Error al eliminar archivo temporal:', err.message);
+            });
+
+            // Devolver la ruta de descarga del archivo modificado  
+            res.send({
+                mensaje: 'Archivo registrado exitosamente.',
+                rutaDescarga: `/descargar-archivo/${path.basename(newFilePath)}`
+            });
+        });
+    }); */
+
 
 
 //Ruta para servir archivos
