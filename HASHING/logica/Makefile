@@ -2,6 +2,6 @@ all:build
 
 build:
 	g++ -c funciones.cpp 
-	g++ -c coder.cpp
-	g++ funciones.o coder.o -o coder.exe
-	coder.exe
+	g++ -c decoder.cpp
+	g++ funciones.o decoder.o -o decoder.exe
+	decoder.exe

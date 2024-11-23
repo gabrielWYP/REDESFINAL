@@ -13,6 +13,12 @@ const upload = multer({ dest: 'uploads/' });
 
 app.use(express.json());
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use('/modificados', express.static(path.join(__dirname, 'modificados')));
+
+
+
 // Ruta para subir archivos
 app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
     if (!req.file) {
@@ -37,6 +43,7 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
         });
     });
 
+    //Para subir el archivo y guardar ambos
 
     const pathReal = `uploads/${originalFileName}`
     const timestamp = new Date().toISOString();
@@ -45,11 +52,12 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
     const pathToExecutable = path.resolve(__dirname, 'coder.exe');
     console.log(pathToExecutable)
 
-    const command = `${pathToExecutable} "${pathReal}" "${pathCarpeta}" "${timestamp}"`;
+    const command_guardar = `${pathToExecutable} "${pathReal}" "${pathCarpeta}" "${timestamp}"`;
 
-    console.log('Ejecutando comando:', command);
+    console.log('Ejecutando comando:', command_guardar);
+
     
-    exec(command, (err, stdout, stderr) => {
+    exec(command_guardar, (err, stdout, stderr) => {
 
         if (err) {
             console.error('Error ejecutando el programa C++:', err.message);
@@ -60,7 +68,40 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
             console.error('Error en el programa C++:', stderr);
             return res.status(500).send('Error en el programa.');
         }
-        /*const hash = stdout.trim(); 
+    });
+
+    
+    //Para obtener el timeStamp hasheado
+
+    const pathDecoder = path.resolve(__dirname, 'decoder.exe')
+
+    const modFile = `modificados/${originalFileName}`
+
+    const command_hash = `${pathDecoder} "${modFile}"`
+
+    console.log("Ejecutando comando: ", command_hash);
+
+    let hash_timeStamp = ""
+    
+    exec(command_hash, (err, stdout, stderr) => {
+
+        if (err) {
+            console.error('Error ejecutando el programa C++:', err.message);
+            return res.status(500).send('Error al procesar el archivo.');
+        }
+
+        if (stderr) {
+            console.error('Error en el programa C++:', stderr);
+            return res.status(500).send('Error en el programa.');
+        }
+
+        hash_timeStamp = stdout.trim();
+        console.log(hash_timeStamp);
+
+        
+    });
+
+        /*
         console.log('hash encontrado', hash);
 
         const query = `INSERT INTO valores_hasheados (archivo_hasheado, timestamp_hash) VALUES (?, ?)`;
@@ -69,24 +110,21 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
                 console.error('Error al guardar en SQLite:', err.message);
                 return res.status(500).send('Error al guardar en la base de datos.');
             }
+        */
+    
 
-            res.send({
-                mensaje: 'Archivo registrado exitosamente.',
-                hash: hash,
-                id: this.lastID,
-                timestamp: timestamp,
-            });
-        }); */
-    });
-});
+    //http://localhost:3000/uploads/nombreArchivo
+    //http://localhost:3000/modificados/nombreArchivo
+}); 
 
 
 //Ruta para servir archivos
 // Ruta para servir archivos
 //CAMBIAR LA RUTAAAAAAAAAAAAAAA DAAAAAAAAAAAAAAAAAAAAA
+// Ruta para servir archivos
 app.get('/descargar-archivo', (req, res) => {
-    const fileName = 'Repaso.pdf'; // Cambia esto al nombre exacto de tu archivo con su extensión
-    const filePath = path.join(__dirname, 'uploads', fileName); // Ruta completa al archivo en la carpeta 'modificado'
+    const fileName = 'RepasoMod.pdf'; // Cambia esto al nombre exacto de tu archivo con su extensión
+    const filePath = path.join(__dirname, 'modificados', fileName); // Ruta completa al archivo en la carpeta 'modificado'
 
     res.download(filePath, fileName, (err) => {
         if (err) {
@@ -96,45 +134,54 @@ app.get('/descargar-archivo', (req, res) => {
     });
 });
 
+
+
 app.get('/buscar-info', (req, res) => {
-    const filePath = req.query.filePath; // Ruta del archivo enviado en la solicitud (e.g., /buscar-info?filePath=tu_archivo.txt)
+    const filePath = req.query.filePath; // Ruta del archivo enviada en la solicitud
     if (!filePath) {
         return res.status(400).send('Es necesario proporcionar la ruta del archivo.');
     }
 
-    // Asegúrate de que la ruta del archivo esté correctamente formateada (usar path.resolve para evitar problemas con las rutas relativas)
-    const resolvedFilePath = path.resolve(filePath);
+    console.log('Ruta recibida:', filePath);
 
-    // Asegúrate de que el archivo existe antes de ejecutar el comando
-    if (!fs.existsSync(resolvedFilePath)) {
+    // Normalizamos la ruta recibida para asegurarnos de que esté correcta
+    const normalizedFilePath = path.normalize(filePath); 
+    const absoluteFilePath = path.resolve(__dirname, normalizedFilePath); // Ruta absoluta al archivo
+
+    // Verificamos si el archivo existe
+    if (!fs.existsSync(absoluteFilePath)) {
         return res.status(400).send('El archivo especificado no existe.');
     }
 
-    // Asegúrate de que el pathToExecutable apunte correctamente al archivo .exe
-    const pathToExecutable = path.resolve(__dirname, 'hashing/logica/prueba2.exe');
-    
-    // Construir el comando correctamente, pasándole la ruta del archivo al ejecutable
-    const command = `"${pathToExecutable}" "${resolvedFilePath}"`;
+    // Ruta al ejecutable (asegúrate de que esta ruta también sea correcta)
+    const pathToExecutable = path.resolve(__dirname, 'decoder.exe');
+    console.log('Ruta del ejecutable:', pathToExecutable);
 
-    console.log('Ejecutando comando:', command); // Verifica que el comando se está construyendo correctamente
+    // Aquí creamos la ruta relativa correctamente, asegurándonos de agregar '..\\..\\' al principio
+    const relativeFilePath = `${normalizedFilePath.replace(path.resolve(__dirname, ''), '').replace(/\\/g, '\\\\')}`;
 
+    // Mostrar la ruta relativa que estamos pasando al ejecutable
+    console.log('Ruta relativa para el comando:', relativeFilePath);
+
+    // Ahora, construimos el comando pasando la ruta relativa correctamente
+    const command = `"${pathToExecutable}" "${relativeFilePath}"`;
+
+    console.log('Ejecutando comando:', command);
+
+    // Ejecutamos el comando
     exec(command, (err, stdout, stderr) => {
         if (err) {
-            console.error('Error al ejecutar prueba2.exe:', err.message);
+            console.error('Error al ejecutar decoder.exe:', err.message);
             return res.status(500).send('Error al procesar el archivo.');
         }
 
         if (stderr) {
-            console.error('Error en el programa prueba2.exe:', stderr);
+            console.error('Error en el programa decoder.exe:', stderr);
             return res.status(500).send('Error en el programa.');
         }
 
-        const last64Chars = stdout.trim(); // Obtener el valor de salida (últimos 64 caracteres)
-        console.log('Últimos 64 caracteres:', last64Chars); // Esto te ayudará a ver el valor en los logs
-
-        // Aquí va el código de la base de datos para verificar el hash...
-        // Consulta en la base de datos si hay coincidencia con `last64Chars`
-        // ...
+        const last64Chars = stdout.trim(); // Obtener los últimos 64 caracteres
+        console.log(last64Chars);
 
         res.send({
             mensaje: 'Comando ejecutado correctamente.',
@@ -142,6 +189,11 @@ app.get('/buscar-info', (req, res) => {
         });
     });
 });
+
+
+
+
+
 
 //Pagina principal  
 

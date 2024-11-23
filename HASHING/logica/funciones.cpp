@@ -54,7 +54,7 @@ void extractLast64Chars(const string& filePath) {
     inputFile.read(buffer, 64); // Leer exactamente 40 bytes
 
     // Imprimir el texto extraído
-    std::cout << "Últimos 64 caracteres del archivo: " << buffer << std::endl;
+    std::cout << buffer;
 }
 
 

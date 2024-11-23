@@ -8,9 +8,9 @@ Gui simple 3: principal, subida, retirada --ALejo
 Este archivo modificado se guarda. --Gepeto Falta hacer endpoints Franco
 
  --Creas el timestamp desde JS. Lo mandas como argumento junto a la carpeta de inicio, la carpeta de fin
-  y la fecha
- --Ejecutas el hash.Se tiene que modificar para que hashee el timestamp y se ejecuta coder.cpp
- --Se incrusta y se devuelve a la carpeta modificados
+  y la fecha --Check
+ --Ejecutas el hash.Se tiene que modificar para que hashee el timestamp y se ejecuta coder.cpp --Check
+ --Se incrusta y se devuelve a la carpeta modificados --Check
 
  -> En servidor, crear URL para el archivo original en carpeta uploads y archivo modificado en modificados.
     Insertas informacion de credenciales + url upload + url modificado + valor hash del timestamp
