@@ -19,19 +19,35 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
         return res.status(400).send('No se recibió ningún archivo.');
     }
     const originalFileName = req.file.originalname;
-    console.log(originalFileName)
 
-    const filePath = `uploads/${originalFileName}`;
+    const filePath = req.file.path;
+    const newFilePath = path.join('uploads', originalFileName);
+    console.log(newFilePath)
 
-    console.log(filePath)
+    fs.rename(filePath, newFilePath, (err) => {
+        if (err) {
+            console.error('Error al mover el archivo:', err.message);
+            return res.status(500).send('Error al guardar el archivo.');
+        }
 
+        // Devolver la ruta de descarga del archivo guardado
+        res.send({
+            mensaje: 'Archivo subido y guardado exitosamente.',
+            rutaArchivo: `/descargar-archivo/${path.basename(newFilePath)}`
+        });
+    });
+
+
+    const pathReal = `uploads/${originalFileName}`
     const timestamp = new Date().toISOString();
     const pathCarpeta = "modificados/";
     
     const pathToExecutable = path.resolve(__dirname, 'coder.exe');
     console.log(pathToExecutable)
 
-    const command = `coder.exe "${filePath}" "${pathCarpeta}" "${timestamp}"`;
+    const command = `${pathToExecutable} "${pathReal}" "${pathCarpeta}" "${timestamp}"`;
+
+    console.log('Ejecutando comando:', command);
     
     exec(command, (err, stdout, stderr) => {
 
