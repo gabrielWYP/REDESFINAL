@@ -59,28 +59,16 @@ void extractLast64Chars(const string& filePath) {
 
 
 
-std::string convertirASCII(string rutaArchivo) {
-    // Abrir el archivo en modo binario
-    std::ifstream archivo(rutaArchivo, std::ios::binary);
-    if (!archivo.is_open()) {
-        throw std::runtime_error("No se pudo abrir el archivo.");
+std::string convertirASCII(string a) {
+    string final;
+    for (int i= 0; i< a.length(); i++){
+
+        int valoractual = int(a[i]);
+        bitset<8> binario(valoractual);
+        string conversion = binario.to_string();
+        final += conversion;
     }
-
-    // Leer el archivo en un vector de bytes
-    std::vector<unsigned char> contenido(
-        (std::istreambuf_iterator<char>(archivo)),
-        std::istreambuf_iterator<char>());
-
-    archivo.close();
-
-    // Convertir cada byte a su representación binaria
-    std::string resultado;
-    for (unsigned char byte : contenido) {
-        std::bitset<8> binario(byte); // Convertir cada byte (8 bits) a binario
-        resultado += binario.to_string(); // Concatenar la representación binaria al resultado final
-    }
-
-    return resultado; // Devolver la cadena binaria completa
+    return final;
 }
 
 string palabraPadeada(string a){
@@ -102,8 +90,6 @@ string palabraPadeada(string a){
         final = a +'1' + ceros +bitdebloqueo.to_string();
     }
     return final;
-    
-
 }
 
 
@@ -526,8 +512,6 @@ string SHA256(string palabra){
 
     return hex;
     
-
-
 }
 
 
