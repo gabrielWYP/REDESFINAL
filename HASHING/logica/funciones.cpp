@@ -1,55 +1,28 @@
 #include "funciones.h"
-#include <ctime>
-#include <sstream>
-#include <bitset>
-#include <vector>
-#include <fstream>
-#include <stdexcept>
-#include <memory>
 
-std::string convertirASCII(const std::string& rutaArchivo) {
+std::string convertirASCII(string rutaArchivo) {
     // Abrir el archivo en modo binario
     std::ifstream archivo(rutaArchivo, std::ios::binary);
     if (!archivo.is_open()) {
         throw std::runtime_error("No se pudo abrir el archivo.");
     }
 
-    // Obtener la fecha y hora actual
-    std::time_t t = std::time(nullptr);
-    std::tm* now = std::localtime(&t);
-    std::string fecha = std::to_string(now->tm_year + 1900) + '-' +
-                        std::to_string(now->tm_mon + 1) + '-' +
-                        std::to_string(now->tm_mday) + ' ' +
-                        std::to_string(now->tm_hour) + ':' +
-                        std::to_string(now->tm_min) + ':' +
-                        std::to_string(now->tm_sec);
-
-    // Convertir la fecha a bytes
-    std::vector<unsigned char> fechaBytes(fecha.begin(), fecha.end());
-
-    const size_t bufferSize = 8192; // Tamaño del bloque
-    std::unique_ptr<unsigned char[]> buffer(new unsigned char[bufferSize]);
-    std::ostringstream resultado;
-
-    // Leer el archivo en bloques y convertir cada bloque a binario
-    while (archivo.read(reinterpret_cast<char*>(buffer.get()), bufferSize) || archivo.gcount() > 0) {
-        size_t bytesRead = archivo.gcount();
-        for (size_t i = 0; i < bytesRead; ++i) {
-            std::bitset<8> binario(buffer[i]); // Convertir cada byte (8 bits) a binario
-            resultado << binario.to_string(); // Concatenar la representación binaria al resultado final
-        }
-    }
-
-    // Añadir la fecha al resultado final
-    for (unsigned char byte : fechaBytes) {
-        std::bitset<8> binario(byte); // Convertir cada byte (8 bits) a binario
-        resultado << binario.to_string(); // Concatenar la representación binaria al resultado final
-    }
+    // Leer el archivo en un vector de bytes
+    std::vector<unsigned char> contenido(
+        (std::istreambuf_iterator<char>(archivo)),
+        std::istreambuf_iterator<char>());
 
     archivo.close();
-    return resultado.str(); // Devolver la cadena binaria completa
-}
 
+    // Convertir cada byte a su representación binaria
+    std::string resultado;
+    for (unsigned char byte : contenido) {
+        std::bitset<8> binario(byte); // Convertir cada byte (8 bits) a binario
+        resultado += binario.to_string(); // Concatenar la representación binaria al resultado final
+    }
+
+    return resultado; // Devolver la cadena binaria completa
+}
 
 string palabraPadeada(string a){
     string final;

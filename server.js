@@ -9,7 +9,7 @@ const app = express();
 const upload = multer({ dest: 'uploads/' });
 app.use(express.json());
 
-const db = new sqlite3.Database('C:/Users/USUARIO/Desktop/final_redes/base_datos/db_redes/db/app.db', (err) => {
+const db = new sqlite3.Database('db/app.db', (err) => {
     if (err) {
         console.error('Error al conectar a SQLite:', err.message);
     } else {

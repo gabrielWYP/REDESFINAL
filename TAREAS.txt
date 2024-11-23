@@ -1,6 +1,6 @@
-Entrada de archivos: cualquiera
+Entrada de archivos: cualquiera --Importante
 
-Combinacion archivo y timestamp
+Listo -> Combinacion archivo y timestamp
 
 Opcional: esteganografia
 
