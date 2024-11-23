@@ -18,17 +18,10 @@ int main(int argc, char* argv[]) {
 
     // Obtener los parámetros desde los argumentos
     string inputFilePath = argv[1];
-    string originalFolder = argv[2];
-    string modifiedFolder = argv[3];
-    string timeStamp = argv[4];
-    
-    string embedText = "TextoDe64CaracteresExactamenteParaEmbed64.";
+    string modifiedFolder = argv[2];
+    string timeStamp = argv[3];
 
-    // Verificar que las carpetas existan o crearlas
-    if (!fs::exists(originalFolder)) {
-        fs::create_directories(originalFolder);
-        cout << "Carpeta creada: " << originalFolder << endl;
-    }
+    string embedText = SHA256(timeStamp);
 
     if (!fs::exists(modifiedFolder)) {
         fs::create_directories(modifiedFolder);
@@ -36,17 +29,9 @@ int main(int argc, char* argv[]) {
     }
 
     // Crear las rutas de destino
-    string originalFilePath = (fs::path(originalFolder) / fs::path(inputFilePath).filename()).string();
     string modifiedFilePath = (fs::path(modifiedFolder) / fs::path(inputFilePath).filename()).string();
 
     // Copiar el archivo original a la carpeta de originales
-    try {
-        fs::copy(inputFilePath, originalFilePath, fs::copy_options::overwrite_existing);
-        cout << "Archivo original guardado en: " << originalFilePath << endl;
-    } catch (const fs::filesystem_error& e) {
-        cerr << "Error al copiar el archivo original: " << e.what() << endl;
-        return 1;
-    }
 
     // Embedir el texto y guardar el archivo modificado
     embedTextInFile(inputFilePath, modifiedFilePath, embedText);

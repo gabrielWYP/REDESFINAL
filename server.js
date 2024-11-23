@@ -19,6 +19,49 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
     const filePath = req.file.path;  // Ruta del archivo temporal
     const originalFileName = req.file.originalname;  // Nombre original del archivo
     const newFilePath = path.join('uploads', originalFileName);  // Ruta donde se guardará el archivo
+    const timestamp = new Date().toISOString();
+    const pathCarpeta = 'modificados/'
+
+    const pathToExecutable = path.resolve(__dirname, 'hashing/logica/coder.exe');
+    const command = `"${pathToExecutable}" "${filePath}" "${pathCarpeta}" "${timestamp}"`;
+
+    exec(command, (err, stdout, stderr) => {
+
+        if (err) {
+            console.error('Error ejecutando el programa C++:', err.message);
+            return res.status(500).send('Error al procesar el archivo.');
+        }
+
+        if (stderr) {
+            console.error('Error en el programa C++:', stderr);
+            return res.status(500).send('Error en el programa.');
+        }
+      
+        const hash = stdout.trim(); 
+        console.log('hash encontrado', hash);
+
+        const query = `INSERT INTO valores_hasheados (archivo_hasheado, timestamp_hash) VALUES (?, ?)`;
+        db.run(query, [hash, new Date().toISOString()], function (err) {
+            if (err) {
+                console.error('Error al guardar en SQLite:', err.message);
+                return res.status(500).send('Error al guardar en la base de datos.');
+            }
+
+            res.send({
+                mensaje: 'Archivo registrado exitosamente.',
+                hash: hash,
+                id: this.lastID,
+                timestamp: timestamp,
+            });
+        });
+
+        fs.unlink(filePath, (err) => {
+            if (err) console.error('Error al eliminar archivo temporal:', err.message);
+        });
+    });
+
+
+
 
     // Mover el archivo del directorio temporal a su destino final
     fs.rename(filePath, newFilePath, (err) => {
@@ -34,54 +77,27 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
         });
     });
 });
-//Ruta para subir archivos
-
-
-    /*const newFilePath = path.join('modificados', `modificado_${originalFileName}`);
-
-    // Leer el archivo y agregar la fecha
-    fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error('Error al leer el archivo:', err.message);
-            return res.status(500).send('Error al procesar el archivo.');
-        }
-
-        // Obtener la fecha y hora actual
-        const now = new Date();
-        const fecha = now.toISOString();
-
-        // Agregar la fecha al contenido del archivo
-        const contenidoModificado = `${data}\n\nFecha: ${fecha}`;
-
-        // Guardar el archivo modificado
-        fs.writeFile(newFilePath, contenidoModificado, 'utf8', (err) => {
-            if (err) {
-                console.error('Error al guardar el archivo modificado:', err.message);
-                return res.status(500).send('Error al guardar el archivo modificado.');
-            }
-
-            // Eliminar el archivo temporal original
-            fs.unlink(filePath, (err) => {
-                if (err) console.error('Error al eliminar archivo temporal:', err.message);
-            });
-
-            // Devolver la ruta de descarga del archivo modificado  
-            res.send({
-                mensaje: 'Archivo registrado exitosamente.',
-                rutaDescarga: `/descargar-archivo/${path.basename(newFilePath)}`
-            });
-        });
-    }); */
-
 
 
 //Ruta para servir archivos
-app.get('/servir-archivos', (req,res) => {
-
+// Ruta para servir archivos
+app.get('/descargar-archivo', (req, res) => {
+    const filePath = path.join(__dirname, 'modificado', 'nombre_del_archivo.ext'); // Reemplaza con el nombre de tu archivo
+    res.download(filePath, 'archivo_descargado.ext', (err) => {
+        if (err) {
+            console.error('Error al descargar el archivo:', err);
+            res.status(500).send('Error al descargar el archivo');
+        }
+    });
 });
 
 //Ruta para buscar archivos
-
+app.get('/buscar-info', (req,res) => {
+    //Se tiene que ingresar un archivo previamente modificado
+    //Se extrae el valor hash de los ultimos 64 digitos
+    //Se busca en la base de datos
+    //Si coincide, enviar de vuelta credenciales, sino se notifica el rechazo de la sesion
+});
 
 //Pagina principal  
 
