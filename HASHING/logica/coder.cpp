@@ -20,6 +20,8 @@ int main(int argc, char* argv[]) {
     string inputFilePath = argv[1];
     string originalFolder = argv[2];
     string modifiedFolder = argv[3];
+    string timeStamp = argv[4];
+    
     string embedText = "TextoDe64CaracteresExactamenteParaEmbed64.";
 
     // Verificar que las carpetas existan o crearlas

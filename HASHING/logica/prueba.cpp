@@ -36,8 +36,13 @@ void embedTextInFile(const std::string& inputFilePath,
 
 int main() {
     // Ruta al archivo original y de salida
-    std::string inputFile = "app.db";
-    std::string outputFile = "mod.db";
+    std::string inputFile;
+    std::string outputFile;
+
+    std::cout << "Ingresa el archivo a modificar: " << std::endl;
+    std::cin >> inputFile;
+    std::cout << "Ingresa el archivo de fin: " << std::endl;
+    std::cin >> outputFile;
 
     // Texto a insertar (exactamente 40 caracteres)
     std::string hiddenText = "3b19ecec8f4a23b9671d62879be605464c70365a2e507ee79a8f03687119848a";
