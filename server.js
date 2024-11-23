@@ -26,8 +26,6 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
     }
 
     
-
-
     const filePath = req.file.path;
 
     const pathToExecutable = path.resolve(__dirname, 'hashing/logica/main.exe'); //Modificar 

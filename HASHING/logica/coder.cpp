@@ -34,8 +34,8 @@ int main(int argc, char* argv[]) {
     }
 
     // Crear las rutas de destino
-    string originalFilePath = fs::path(originalFolder) / fs::path(inputFilePath).filename();
-    string modifiedFilePath = fs::path(modifiedFolder) / fs::path(inputFilePath).filename();
+    string originalFilePath = (fs::path(originalFolder) / fs::path(inputFilePath).filename()).string();
+    string modifiedFilePath = (fs::path(modifiedFolder) / fs::path(inputFilePath).filename()).string();
 
     // Copiar el archivo original a la carpeta de originales
     try {
