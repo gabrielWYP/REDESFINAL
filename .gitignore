@@ -1,10 +1,7 @@
 /node_modules/
-/uploads/
-/modificados/
+
 
 HASHING/logica/*.o
 HASHING/logica/*.jpg
 node_modules
-uploads
-modificados
-modificado
+

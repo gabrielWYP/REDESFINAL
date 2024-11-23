@@ -13,11 +13,6 @@ const upload = multer({ dest: 'uploads/' });
 
 app.use(express.json());
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-app.use('/modificados', express.static(path.join(__dirname, 'modificados')));
-
-
 
 // Ruta para subir archivos
 app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
@@ -99,6 +94,10 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
         console.log(hash_timeStamp);
 
         
+        
+        
+        
+        
     });
 
         /*
@@ -116,6 +115,10 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
     //http://localhost:3000/uploads/nombreArchivo
     //http://localhost:3000/modificados/nombreArchivo
 }); 
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+app.use('/modificados', express.static(path.join(__dirname, 'modificados')));
 
 
 //Ruta para servir archivos

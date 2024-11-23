@@ -13,11 +13,12 @@ Este archivo modificado se guarda. --Gepeto Falta hacer endpoints Franco
  --Se incrusta y se devuelve a la carpeta modificados --Check
 
  -> En servidor, crear URL para el archivo original en carpeta uploads y archivo modificado en modificados.
+    --Faltan
     Insertas informacion de credenciales + url upload + url modificado + valor hash del timestamp
 
 
 3.- Se guarda en la DB la informacion  + el hash de la fecha --Gabo  (VARCHAR 1000 INFO, VARCHAR 64 HASH)
-
+    
 
 
 4.- Se sirve al cliente el archivo modificado (con el hash de la fecha) --Gepeto
