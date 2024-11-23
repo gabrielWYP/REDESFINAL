@@ -5,7 +5,7 @@ Gui simple 3: principal, subida, retirada --ALejo
 
 1.- Subir informacion + archivo --Check
 2.- Se hashea la fecha actual (en la q se subio el archivo) y se incrusta en el archivo.
-Este archivo modificado se guarda. --Gepeto Falta hacer endpoints Franco
+Este archivo modificado se guarda. -- Falta hacer endpoints Franco
 
  --Creas el timestamp desde JS. Lo mandas como argumento junto a la carpeta de inicio, la carpeta de fin
   y la fecha --Check
@@ -21,7 +21,7 @@ Este archivo modificado se guarda. --Gepeto Falta hacer endpoints Franco
     -Check
 
 
-4.- Se sirve al cliente el archivo modificado (con el hash de la fecha) --Gepeto
+4.- Se sirve al cliente el archivo modificado (con el hash de la fecha) --
 //Check
 
 

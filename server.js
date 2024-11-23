@@ -49,7 +49,6 @@ const ejecutarComandoGuardar = (ejecutable, archivo, destino, timeStamp, res) =>
             return res.status(500).send('Error en el programa.');
         }
     });
-
 }
 
 const ejecutarComandoHash = (pathDecode, filePath, res) => {
@@ -154,87 +153,53 @@ app.get('/descargar-archivo/:nombreArchivo', (req, res) => {
 });
 
 
-
-app.get('/buscar-info', (req, res) => {
-    const filePath = req.query.filePath; // Ruta del archivo enviada en la solicitud
-    if (!filePath) {
-        return res.status(400).send('Es necesario proporcionar la ruta del archivo.');
-    }
-
-    console.log('Ruta recibida:', filePath);
-
-    // Normalizamos la ruta recibida para asegurarnos de que esté correcta
-    const normalizedFilePath = path.normalize(filePath); 
-    const absoluteFilePath = path.resolve(__dirname, normalizedFilePath); // Ruta absoluta al archivo
-
-    // Verificamos si el archivo existe
-    if (!fs.existsSync(absoluteFilePath)) {
-        return res.status(400).send('El archivo especificado no existe.');
-    }
-
-    // Ruta al ejecutable (asegúrate de que esta ruta también sea correcta)
-    const pathToExecutable = path.resolve(__dirname, 'decoder.exe');
-    console.log('Ruta del ejecutable:', pathToExecutable);
-
-    // Aquí creamos la ruta relativa correctamente, asegurándonos de agregar '..\\..\\' al principio
-    const relativeFilePath = `${normalizedFilePath.replace(path.resolve(__dirname, ''), '').replace(/\\/g, '\\\\')}`;
-
-    // Mostrar la ruta relativa que estamos pasando al ejecutable
-    console.log('Ruta relativa para el comando:', relativeFilePath);
-
-    // Ahora, construimos el comando pasando la ruta relativa correctamente
-    const command = `"${pathToExecutable}" "${relativeFilePath}"`;
-
-    console.log('Ejecutando comando:', command);
-
-    // Ejecutamos el comando
-    exec(command, (err, stdout, stderr) => {
-        if (err) {
-            console.error('Error al ejecutar decoder.exe:', err.message);
-            return res.status(500).send('Error al procesar el archivo.');
-        }
-
-        if (stderr) {
-            console.error('Error en el programa decoder.exe:', stderr);
-            return res.status(500).send('Error en el programa.');
-        }
-
-        const last64Chars = stdout.trim(); // Obtener los últimos 64 caracteres
-        console.log(last64Chars);
-
-        res.send({
-            mensaje: 'Comando ejecutado correctamente.',
-            hash: last64Chars
-        });
-    });
-});
-
-
-
-app.post('/buscar-info2', upload.single('archivo'), (req, res) => {
+app.post('/buscar-info', upload.single('fileInput'), async (req, res) => {
     if (!req.file) {
         return res.status(400).send('No se recibió ningún archivo.');
     }
-
     const originalFileName = req.file.originalname;
+    const filePath = req.file.path;
+    const tempFilePath = path.join('temp', originalFileName);
 
-    // Ruta para guardar el archivo en la carpeta tmp
-    const tmpFolderPath = path.join('tmp', originalFileName);
-    console.log('Ruta donde se guardará el archivo:', tmpFolderPath);
+    try {
 
-    // Mover el archivo a la carpeta tmp
-    fs.rename(req.file.path, tmpFolderPath, (err) => {
-        if (err) {
-            console.error('Error al mover el archivo:', err.message);
-            return res.status(500).send('Error al guardar el archivo.');
+        if (!fs.existsSync('temp')) {
+            fs.mkdirSync('temp');
         }
+        // Mover el archivo a la carpeta temporal
+        await guardarArchivo(filePath, tempFilePath, res);
 
-        // Devolver la ruta del archivo guardado en tmp
-        res.send({
-            mensaje: 'Archivo subido y guardado exitosamente.',
-            rutaArchivo: `/tmp/${originalFileName}`
+        // Obtener el hash del archivo temporal
+        const pathDecoder = path.resolve(__dirname, 'decoder.exe');
+        const hashValor = await ejecutarComandoHash(pathDecoder, tempFilePath);
+
+        // Consultar la base de datos para verificar si el hash existe
+        const query = `SELECT * FROM valores_hasheados WHERE hash_value_modified = ?`;
+        db.get(query, [hashValor], (err, row) => {
+            if (err) {
+                console.error('Error al consultar la base de datos:', err.message);
+                return res.status(500).send('Error al consultar la base de datos.');
+            }
+            fs.unlink(tempFilePath, (err) => {
+                if (err) {
+                    console.error('Error al eliminar el archivo temporal:', err.message);
+                }
+            });
+            
+            if (row) {
+                res.send({
+                    mensaje: 'Archivo encontrado en la base de datos.',
+                    data: row.informacion
+                });
+            } else {
+                res.status(404).send('Archivo no encontrado en la base de datos.');
+            }
         });
-    });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send(error);
+    }
 });
 
 

@@ -23,13 +23,20 @@
         <form id="imageForm">
             <div>
                 <label for="imageInput">Subir archivo:</label>
-                <input type="file" id="imageInput" accept="image/*" />
+                <input type="file" id="imageInput" name="fileInput"  />
             </div>
             <button type="submit">Buscar</button>
         </form>
-    
+
         <div id="resultMessage" class="hidden">
-            <p>¡Imagen subida con éxito! Se está verificando su originalidad...</p>
+            <p>No se ha encontrado el Archivo en la DB</p>
+        </div>
+
+        <!-- Contenedor para la imagen y el botón de descarga -->
+        <div id="imageResult" class="hidden">
+            <a id="downloadLink" href="" download>
+                <button type="button">Descargar Archivo</button>
+            </a>
         </div>
     </main>
     
