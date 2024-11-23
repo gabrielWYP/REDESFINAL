@@ -1,5 +1,64 @@
 #include "funciones.h"
 
+void embedTextInFile(const string& inputFilePath,const string& outputFilePath, const string& text) {
+    // Verificar que el texto tenga 40 caracteres
+    if (text.size() != 64) {
+        std::cerr << "El texto debe tener exactamente 64 caracteres." << std::endl;
+        return;
+    }
+
+    // Abrir el archivo original en modo binario
+    std::ifstream inputFile(inputFilePath, std::ios::binary);
+    if (!inputFile) {
+        std::cerr << "Error al abrir el archivo original." << std::endl;
+        return;
+    }
+
+    // Crear el archivo de salida en modo binario
+    std::ofstream outputFile(outputFilePath, std::ios::binary);
+    if (!outputFile) {
+        std::cerr << "Error al crear el archivo de salida." << std::endl;
+        return;
+    }
+
+    // Copiar el contenido del archivo original al archivo de salida
+    outputFile << inputFile.rdbuf();
+
+    // Escribir los 40 caracteres al final del archivo de salida
+    outputFile.write(text.c_str(), text.size());
+
+    std::cout << "Texto embebido y archivo guardado en: " << outputFilePath << std::endl;
+}
+
+void extractLast40Chars(const string& filePath) {
+    // Abrir el archivo en modo binario
+    std::ifstream inputFile(filePath, std::ios::binary);
+    if (!inputFile) {
+        std::cerr << "Error al abrir el archivo." << std::endl;
+        return;
+    }
+
+    // Mover el cursor al final menos 40 bytes
+    inputFile.seekg(0, std::ios::end); // Ir al final del archivo
+    std::streampos fileSize = inputFile.tellg(); // Obtener tamaño del archivo
+
+    if (fileSize < 64) {
+        std::cerr << "El archivo tiene menos de 64 bytes, no se puede leer." << std::endl;
+        return;
+    }
+
+    inputFile.seekg(-64, std::ios::end); // Mover 40 bytes antes del final
+
+    // Leer los últimos 40 caracteres
+    char buffer[65] = {0}; // Crear un buffer para los 40 caracteres más el terminador nulo
+    inputFile.read(buffer, 64); // Leer exactamente 40 bytes
+
+    // Imprimir el texto extraído
+    std::cout << "Últimos 64 caracteres del archivo: " << buffer << std::endl;
+}
+
+
+
 std::string convertirASCII(string rutaArchivo) {
     // Abrir el archivo en modo binario
     std::ifstream archivo(rutaArchivo, std::ios::binary);

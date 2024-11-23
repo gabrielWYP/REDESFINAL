@@ -1,11 +1,13 @@
-Entrada de archivos: cualquiera --Importante
 
-Listo -> Combinacion archivo y timestamp
+Listo -> Combinacion URL y timestamp
 
-Opcional: esteganografia
+Gui simple 3: principal, subida, retirada --ALejo
 
-Gui simple 3: principal, subida, retirada 
+1.- Subir informacion + archivo --Check
+2.- Se hashea la fecha actual (en la q se subio el archivo) y se incrusta en el archivo. Este archivo modificado se guarda. --Gepeto Falta hacer endpoints Franco
+3.- Se guarda en la DB la informacion  + el hash de la fecha --Gabo  (VARCHAR 1000 INFO, VARCHAR 64 HASH)
+4.- Se sirve al cliente el archivo modificado (con el hash de la fecha) --Gepeto
+5.- Si el cliente quiere acceder a su informacion, se leera la imagen y se extraera el hash. Si este coincide con uno de los de la DB, entonces accede. Sino, no.
+--Gus Gus
 
-Que se permitan la descarga de los archivos hasheados con el timestamp incluido
 
-Busqueda de archivo: obtener credenciales

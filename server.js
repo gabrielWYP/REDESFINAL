@@ -17,6 +17,7 @@ const db = new sqlite3.Database('db/app.db', (err) => {
     }
 });
 
+//Ruta para subir archivos
 app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
     if (!req.file) {
         return res.status(400).send('No se recibió ningún archivo.');
@@ -62,6 +63,17 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
         });
     });
 });
+
+
+//Ruta para servir archivos
+app.get('/servir-archivos', (req,res) => {
+
+});
+
+//Ruta para buscar archivos
+
+
+//Pagina principal  
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
