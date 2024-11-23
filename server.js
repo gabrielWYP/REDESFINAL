@@ -12,8 +12,10 @@ const app = express();
 const upload = multer({ dest: 'uploads/' });
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 app.use('/modificados', express.static(path.join(__dirname, 'modificados')));
+app.use('/css', express.static(path.join(__dirname, 'css')));
+app.use('/js', express.static(path.join(__dirname, 'js')));
+app.use('/img', express.static(path.join(__dirname, 'img')));
 
 app.use(express.json());
 
@@ -21,7 +23,6 @@ app.use(express.json());
 function sleep(ms) {
     const start = Date.now();
     while (Date.now() - start < ms) {
-        // Espera activa
     }
 }
 
@@ -66,14 +67,16 @@ const ejecutarComandoHash = (pathDecode, filePath, res) => {
             }
         });
     });
-    
 }
 
 // Ruta para subir archivos
-app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
+app.post('/subir-archivo', upload.single('fileInput'), (req, res) => {
     if (!req.file) {
         return res.status(400).send('No se recibió ningún archivo.');
     }
+
+    const textInput = req.body.textInput;
+
     //Para guardar el archivo
     const originalFileName = req.file.originalname;
     const filePath = req.file.path;
@@ -116,13 +119,11 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
         // Aquí `hashValor` estará actualizado después de que se resuelva la promesa
         console.log('Variable externa hashValor:', hashValor);
 
-        const info = "ga";
-
         const query = `
             INSERT INTO valores_hasheados (informacion, URL_vanilla, URL_modified, hash_value_modified)
             VALUES (?, ?, ?, ?)
         `;
-        db.run(query, [info, originalUrl, modifiedUrl, hashValor], function (err) {
+        db.run(query, [textInput, originalUrl, modifiedUrl, hashValor], function (err) {
             if (err) {
                 console.error('Error al guardar en SQLite:', err.message);
                 return res.status(500).send('Error al guardar en la base de datos.');
@@ -130,28 +131,19 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
 
             res.send({
                 id: this.lastID,
-                informacion: info,
+                informacion: textInput,
                 URL_vanilla: originalUrl,
                 URL_modified: modifiedUrl,
                 hash_value_modified: hashValor,
             });
         });
-
-
-        
     });
-
 }); 
 
-
-
-//Ruta para servir archivos
 // Ruta para servir archivos
-//CAMBIAR LA RUTAAAAAAAAAAAAAAA DAAAAAAAAAAAAAAAAAAAAA
-// Ruta para servir archivos
-app.get('/descargar-archivo', (req, res) => {
-    const fileName = 'RepasoMod.pdf'; // Cambia esto al nombre exacto de tu archivo con su extensión
-    const filePath = path.join(__dirname, 'modificados', fileName); // Ruta completa al archivo en la carpeta 'modificado'
+app.get('/descargar-archivo/:nombreArchivo', (req, res) => {
+    const fileName = req.params.nombreArchivo; 
+    const filePath = path.join(__dirname, 'modificados', fileName); 
 
     res.download(filePath, fileName, (err) => {
         if (err) {
@@ -249,7 +241,15 @@ app.post('/buscar-info2', upload.single('archivo'), (req, res) => {
 //Pagina principal  
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'index2.html'));
+});
+
+app.get('/buscararchivo.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'buscararchivo.html'));
+});
+
+app.get('/subirarchivo.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'subirarchivo.html'));
 });
 
 app.listen(3000, () => {

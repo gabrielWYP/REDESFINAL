@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/principal2.js" defer></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="subirarchivo.html">Subir</a></li>
+                <li><a href="buscararchivo.html">Buscar</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="principal2-container">
+        <h1>Buscar documentos</h1>
+        <form id="imageForm">
+            <div>
+                <label for="imageInput">Subir archivo:</label>
+                <input type="file" id="imageInput" accept="image/*" />
+            </div>
+            <button type="submit">Buscar</button>
+        </form>
+    
+        <div id="resultMessage" class="hidden">
+            <p>¡Imagen subida con éxito! Se está verificando su originalidad...</p>
+        </div>
+    </main>
+    
+</body>
+</html>

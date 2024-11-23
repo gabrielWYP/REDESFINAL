@@ -18,10 +18,14 @@ Este archivo modificado se guarda. --Gepeto Falta hacer endpoints Franco
 
 
 3.- Se guarda en la DB la informacion  + el hash de la fecha --Gabo  (VARCHAR 1000 INFO, VARCHAR 64 HASH)
-    
+    -Check
 
 
 4.- Se sirve al cliente el archivo modificado (con el hash de la fecha) --Gepeto
+//Check
+
+
+
 5.- Si el cliente quiere acceder a su informacion, se leera la imagen y se extraera el hash. Si este coincide con uno de los de la DB, entonces accede. Sino, no.
 --Gus Gus
 

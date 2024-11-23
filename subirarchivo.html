@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subir</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/script.js" defer></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <ul class="navbar-menu">
+                <li><a href="/" class="navbar-link">Home</a></li>
+                <li><a href="subirarchivo.html" class="navbar-link active">Subir</a></li>
+                <li><a href="buscararchivo.html" class="navbar-link">Buscar</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-principal1">
+        <section class="upload-section">
+            <h1 class="section-title">Subir texto y archivo</h1>
+            <form id="uploadForm" class="upload-form">
+                <div class="form-group">
+                    <label for="textInput" class="form-label">Texto (máx. 1000 caracteres):</label>
+                    <textarea
+                        id="textInput"
+                        class="form-textarea"
+                        maxlength="1000"
+                        rows="5"
+                        placeholder="Escribe algo aquí..."
+                    ></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="fileInput" class="form-label">Subir archivo:</label>
+                    <input type="file" id="fileInput" class="form-input" />
+                </div>
+
+                <button type="submit" class="form-button">Subir</button>
+            </form>
+        </section>
+
+        <section id="loader" class="loader hidden">
+            <p class="loader-text">Subiendo...</p>
+            <div class="spinner"></div>
+        </section>
+
+        <section id="result" class="result hidden">
+            <h2 class="result-title">Archivo Subido:</h2>
+            <a id="downloadLink" href="" download>
+                <button class="form-button">Descargar Archivo</button>
+            </a>
+        </section>
+    </main>
+</body>
+</html>
+
