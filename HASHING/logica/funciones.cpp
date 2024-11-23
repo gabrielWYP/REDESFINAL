@@ -30,7 +30,7 @@ void embedTextInFile(const string& inputFilePath,const string& outputFilePath, c
     std::cout << "Texto embebido y archivo guardado en: " << outputFilePath << std::endl;
 }
 
-void extractLast40Chars(const string& filePath) {
+void extractLast64Chars(const string& filePath) {
     // Abrir el archivo en modo binario
     std::ifstream inputFile(filePath, std::ios::binary);
     if (!inputFile) {

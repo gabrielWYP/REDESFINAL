@@ -9,7 +9,7 @@
 using namespace std;
 
 void embedTextInFile(const std::string& inputFilePath,const std::string& outputFilePath,const std::string& text);
-void extractLast40Chars(const string& filePath);
+void extractLast64Chars(const string& filePath);
 string convertirASCII(string a);
 string palabraPadeada( string a);
 vector<string> numerobinarioIncial(string a);   

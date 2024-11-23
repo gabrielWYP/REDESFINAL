@@ -9,6 +9,8 @@ const app = express();
 const upload = multer({ dest: 'uploads/' });
 app.use(express.json());
 
+//Conexion a la DB
+
 const db = new sqlite3.Database('db/app.db', (err) => {
     if (err) {
         console.error('Error al conectar a SQLite:', err.message);
@@ -23,9 +25,12 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
         return res.status(400).send('No se recibió ningún archivo.');
     }
 
+    
+
+
     const filePath = req.file.path;
 
-    const pathToExecutable = path.resolve(__dirname, 'hashing/logica/main.exe');
+    const pathToExecutable = path.resolve(__dirname, 'hashing/logica/main.exe'); //Modificar 
     const command = `"${pathToExecutable}" "${filePath}"`; 
 
     exec(command, (err, stdout, stderr) => {
@@ -43,7 +48,7 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
         const hash = stdout.trim(); 
         console.log('hash encontrado', hash);
 
-        const query = `INSERT INTO valores_hasheados (archivo_hasheado, timestamp_hash) VALUES (?, ?)`;
+        const query = `INSERT INTO valores_hasheados (archivo_hasheado, timestamp_hash) VALUES (?, ?)`; //Modificar
         db.run(query, [hash, new Date().toISOString()], function (err) {
             if (err) {
                 console.error('Error al guardar en SQLite:', err.message);
