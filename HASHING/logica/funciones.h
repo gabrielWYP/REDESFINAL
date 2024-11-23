@@ -10,7 +10,7 @@ using namespace std;
 
 
 
-string convertirASCII( string a);
+string convertirASCII(const string& a);
 string palabraPadeada( string a);
 vector<string> numerobinarioIncial(string a);
 vector<string>  hashearvalorInicial (void);

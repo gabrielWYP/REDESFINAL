@@ -1,0 +1,11 @@
+Entrada de archivos: cualquiera
+
+Combinacion archivo y timestamp
+
+Opcional: esteganografia
+
+Gui simple 3: principal, subida, retirada 
+
+Que se permitan la descarga de los archivos hasheados con el timestamp incluido
+
+Busqueda de archivo: obtener credenciales
