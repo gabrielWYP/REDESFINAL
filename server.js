@@ -37,6 +37,7 @@ const guardarArchivo = (archivoPath, nuevoPath, res) => {
 
 const ejecutarComandoGuardar = (ejecutable, archivo, destino, timeStamp, res) => {
     const comandoGuardar = `${ejecutable} "${archivo}" "${destino}" "${timeStamp}"`;
+    console.log(comandoGuardar)
     exec(comandoGuardar, (err, stdout, stderr) => {
 
         if (err) {
@@ -96,7 +97,7 @@ app.post('/subir-archivo', upload.single('fileInput'), (req, res) => {
     ejecutarComandoGuardar(pathToExecutable,pathReal,pathCarpeta,timestamp,res);
 
     //Await para ejecutar el comando
-    sleep(300);
+    sleep(1000);
 
     //Para obtener el timeStamp hasheado
 
