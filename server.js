@@ -37,6 +37,7 @@ const guardarArchivo = (archivoPath, nuevoPath, res) => {
 
 const ejecutarComandoGuardar = (ejecutable, archivo, destino, timeStamp, res) => {
     const comandoGuardar = `${ejecutable} "${archivo}" "${destino}" "${timeStamp}"`;
+    console.log(comandoGuardar)
     exec(comandoGuardar, (err, stdout, stderr) => {
 
         if (err) {

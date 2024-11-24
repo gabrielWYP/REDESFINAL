@@ -108,10 +108,6 @@ app.post('/subir-archivo', upload.single('archivo'), (req, res) => {
 
 
 
-//Ruta para servir archivos
-// Ruta para servir archivos
-//CAMBIAR LA RUTAAAAAAAAAAAAAAA DAAAAAAAAAAAAAAAAAAAAA
-// Ruta para servir archivos
 app.get('/descargar-archivo', (req, res) => {
     const fileName = 'RepasoMod.pdf'; // Cambia esto al nombre exacto de tu archivo con su extensión
     const filePath = path.join(__dirname, 'modificados', fileName); // Ruta completa al archivo en la carpeta 'modificado'
