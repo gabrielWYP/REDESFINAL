@@ -62,7 +62,7 @@ const handleSubmit = (event) => {
         result.classList.remove("hidden");
 
         isLoading = false;
-    }, 2000); // Tiempo de simulación (2 segundos)
+    }, 2500); 
 };
 
 // Asigna los manejadores de eventos
@@ -71,7 +71,7 @@ document.getElementById("uploadForm").addEventListener("submit", handleSubmit);
 
 document.getElementById("downloadLink").addEventListener("click", () => {
     setTimeout(() => {
-        // Redirigir automáticamente a index2.html después de 3 segundos
+        
         window.location.href = '/';
-    }, 3000); // Tiempo de espera (3 segundos)
+    }, 5000); 
 });
