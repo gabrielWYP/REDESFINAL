@@ -62,7 +62,7 @@ const handleSubmit = (event) => {
         result.classList.remove("hidden");
 
         isLoading = false;
-    }, 2500); 
+    }, 2000); 
 };
 
 // Asigna los manejadores de eventos
