@@ -235,3 +235,14 @@ form #textInput {
 .hero.background-dark .upload-btn:hover {
     background-color: #0056b3;
 }
+
+
+#denied {
+    color: darkred;
+    font-size: 30px;
+}
+
+#success {
+    color: green;
+    font-size: 30px;
+}
