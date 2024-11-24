@@ -20,7 +20,7 @@ imageForm.addEventListener("submit", (event) => {
     const formData = new FormData();
     formData.append('fileInput', uploadedFile);
 
-    fetch('/buscar-info', {
+    fetch(`${windows.location.origin}/buscar-info`, {
         method: 'POST',
         body: formData
     })

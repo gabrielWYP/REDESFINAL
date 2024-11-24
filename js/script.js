@@ -27,7 +27,7 @@ const handleSubmit = (event) => {
     formData.append('fileInput', fileInput);
     formData.append('textInput', textInput);
 
-                fetch('/subir-archivo', {
+                fetch(`${window.location.origin}/subir-archivo`, {
                     method: 'POST',
                     body: formData
                 })
@@ -54,7 +54,7 @@ const handleSubmit = (event) => {
     setTimeout(() => {
         // Simula la subida del archivo
         const downloadLink = document.getElementById("downloadLink");
-        const objectURL = `http://localhost:3000/modificados/${file.name}`;  // Crea una URL temporal del archivo
+        const objectURL = `${window.location.origin}/modificados/${file.name}`;  // Crea una URL temporal del archivo
         downloadLink.href = objectURL;
         downloadLink.download = file.name;  // El archivo se descargará con el nombre original
 

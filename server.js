@@ -82,8 +82,8 @@ app.post('/subir-archivo', upload.single('fileInput'), (req, res) => {
     const filePath = req.file.path;
     const newFilePath = path.join('uploads', originalFileName);
 
-    const originalUrl = `http://localhost:3000/uploads/${originalFileName}`;
-    const modifiedUrl = `http://localhost:3000/modificados/${originalFileName}`;
+    const originalUrl = `http://${req.hostname}:3000/uploads/${originalFileName}`;
+    const modifiedUrl = `http://${req.hostname}/modificados/${originalFileName}`;
 
     guardarArchivo(filePath, newFilePath, res);
 
@@ -92,7 +92,7 @@ app.post('/subir-archivo', upload.single('fileInput'), (req, res) => {
     const pathReal = `uploads/${originalFileName}`
     const timestamp = new Date().toISOString();
     const pathCarpeta = "modificados/";
-    const pathToExecutable = path.resolve(__dirname, 'coder.exe');
+    const pathToExecutable = path.resolve(__dirname, 'coder');
 
     ejecutarComandoGuardar(pathToExecutable,pathReal,pathCarpeta,timestamp,res);
 
@@ -105,7 +105,7 @@ app.post('/subir-archivo', upload.single('fileInput'), (req, res) => {
 
     const actualizarHashValor = async () => {
         try {
-            const pathDecoder = path.resolve(__dirname, 'decoder.exe');
+            const pathDecoder = path.resolve(__dirname, 'decoder');
             const modFile = `modificados/${originalFileName}`;
     
             // Espera al resultado de la promesa y asigna el valor a la variable global
@@ -218,6 +218,8 @@ app.get('/subirarchivo.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'subirarchivo.html'));
 });
 
-app.listen(3000, () => {
-    console.log('Servidor backend corriendo en http://localhost:3000');
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
 });

@@ -125,7 +125,9 @@
     "numbers": "cpp",
     "span": "cpp",
     "text_encoding": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "semaphore": "cpp",
+    "cinttypes": "cpp"
   },
   "C_Cpp.default.compilerPath": "c:\\MinGW\\bin\\g++.exe"
 }
