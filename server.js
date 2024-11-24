@@ -171,7 +171,7 @@ app.post('/buscar-info', upload.single('fileInput'), async (req, res) => {
         await guardarArchivo(filePath, tempFilePath, res);
 
         // Obtener el hash del archivo temporal
-        const pathDecoder = path.resolve(__dirname, 'decoder.exe');
+        const pathDecoder = path.resolve(__dirname, 'decoder');
         const hashValor = await ejecutarComandoHash(pathDecoder, tempFilePath);
 
         // Consultar la base de datos para verificar si el hash existe
