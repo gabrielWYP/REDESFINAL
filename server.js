@@ -97,7 +97,7 @@ app.post('/subir-archivo', upload.single('fileInput'), (req, res) => {
     ejecutarComandoGuardar(pathToExecutable,pathReal,pathCarpeta,timestamp,res);
 
     //Await para ejecutar el comando
-    sleep(1000);
+    sleep(2000);
 
     //Para obtener el timeStamp hasheado
 
