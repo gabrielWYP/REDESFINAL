@@ -36,7 +36,7 @@ const guardarArchivo = (archivoPath, nuevoPath, res) => {
 }
 
 const ejecutarComandoGuardar = (ejecutable, archivo, destino, timeStamp, res) => {
-    const comandoGuardar = `${ejecutable} "${archivo}" "${destino}" "${timeStamp}"`;
+    const comandoGuardar = `"${ejecutable}" "${archivo}" "${destino}" "${timeStamp}"`;
     console.log(comandoGuardar)
     exec(comandoGuardar, (err, stdout, stderr) => {
 
@@ -54,7 +54,7 @@ const ejecutarComandoGuardar = (ejecutable, archivo, destino, timeStamp, res) =>
 
 const ejecutarComandoHash = (pathDecode, filePath, res) => {
     return new Promise((resolve, reject) => {
-        const comandoHashear = `${pathDecode} "${filePath}"`;
+        const comandoHashear = `"${pathDecode}" "${filePath}"`;
         exec(comandoHashear, (err, stdout, stderr) => {
             if (err) {
                 console.error('Error ejecutando el programa C++:', err.message);
